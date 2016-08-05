@@ -659,25 +659,25 @@ constructed, and the root of AMT is returned.
 \subsection{Verification}
 \label{subsec:matching}
 
-As stated in the filtering phase, once a suspicious position in the
-text has been detected by the filter module, the verification module
-checks that position for real pattern occurrences. Specifically, for
-such a suspicious position $i$, the engine searches a sequence of
-substrings of the text, where the first substring starts at $i$, in
-the corresponding nodes in AMT from the root. If the text successfully
-matched a key that is marked as a pattern end in some node, a pattern
-is declared to be found at position $i$. However, if there is a
-mismatch or the searching goes beyond the leaves of AMT, the engine
-immediately forwards to the next position $i+1$ and invokes the
-filter.
+As stated in the filter module, once a suspicious position in the text
+has been detected, the verification module checks that position for
+real pattern occurrences. Specifically, for such a suspicious position
+$i$, the engine searches a sequence of substrings of the text, where
+the first substring starts at $i$, in the corresponding nodes of AMT
+from the root. If any substring successfully matched a key that is
+marked as a pattern end in some node, a pattern is declared to be
+found at position $i$. However, if there is a mismatch or the
+searching goes beyond the leaves of AMT, the engine immediately
+forwards to the next position $i+1$ and invokes the filter again.
 
 The pseudocode of the verification procedure is shown in Algorithm
-\ref{alg:matching}. Suppose $i$ is a suspicious position in the
-text. The $m\_len$ is the total length of the successfully matched
-sub-strings of the text. The $node$ points to the current matching
-node in the AMT. In addition, since all the keys in a node have the
-same length, the notation $key\_len(node)$ is used to denote the
-length of the keys in $node$.
+\ref{alg:matching}. Suppose $i$ is a suspicious position of the text
+detected by the filter module. The variable $m\_len$ is the total
+length of the sub-strings of the text who have matched with keys in
+AMT nodes. The variable $node$ points to the current searching node in
+the AMT. In addition, since all the keys in a node have the same
+length, the notation $key\_len(node)$ is used to denote the length of
+the keys in $node$.
 
 \begin{algorithm}
   \caption{Verification}\scriptsize
@@ -709,12 +709,12 @@ checking starts form the root of AMT: if the corresponding sub-string
 $T[i+m\_len, \, key\_len(node)]$ matches some $key$ in the current
 $node$, the totally matched length $m\_len$ is increased by the length
 of the key. At the same time, if the matched $key$ is also marked as a
-pattern end, the engine will report that a pattern, which is
-$T[i,\,m\_len]$, is found at position $i$. Then the matching transfers
-to the child of $node.key$ and makes that child node to be the current
-node. Once there is a mismatch or the current node goes beyond the
-leaves of AMT (i.e.  $node = NULL$), the verification terminates, and
-the engine forwards to the next position $i+1$.
+pattern end, the verification module will report that a pattern,
+i.e. $T[i,\,m\_len]$, is found at position $i$. Then the checking
+transfers to the child of $node.key$ and makes that child node to be
+the current node. Once there is a mismatch or the current node goes
+beyond the leaves of AMT (i.e.  $node = NULL$), the checking
+terminates, and the engine forwards to the next position $i+1$.
 
 Note that, since the nodes in AMT have various types of inner
 structures, the search of the target string in a node, must use the
@@ -729,27 +729,26 @@ search routine specified to the type of that node.
 \end{figure}
 
 Next, an example is given in figure \ref{fig:matching} to illuminate
-the verification for position $i$ of a given text string $T$, using
-the AMT built in section \ref{subsec:amt}. The verification starts
-from the root of AMT: according to $key\_len(root)=2$, the same length
-sub-string starting at position $i$ of $T$, which is $T[i,\,2]=aa$, is
-taken to check whether it's one of the keys in root. The result is:
-$aa \in root$, and $aa$ is also marked as a pattern end. Therefore the
-pattern $T[i,\,2]=aa$ (actually $p_6$ in $P$) is found at position
-$i$. Then the verification transfers to $node_1$, which is the child
-node of $root.aa$.
+the verification for a suspicious position $i$ of a given text string
+$T$, using the AMT built in section \ref{subsec:amt}. The verification
+starts from the root of AMT: according to $key\_len(root)=2$, the same
+length sub-string starting at position $i$ of $T$, which is
+$T[i,\,2]=aa$, is taken to check whether it's one of the keys in
+root. The result is: $aa \in root$, and $aa$ is also marked as a
+pattern end. Therefore the pattern $T[i,\,2]=aa$ ($p_6$ in $P$) is
+found at position $i$. Then the checking transfers to $node_1$, which
+is the child node of $root.aa$.
 
 At $node_1$, since $key\_len(node_1)=6$, the same length sub-string
 $T[i+2,\,6]=e^6$, which follows $T[i,\,2]$, is trying to match with
 some key in $node_1$. The result is that: $e^6 \in node_1$ but it is
-not a pattern end. Then the verification simply transfers to $node_5$,
+not a pattern end. Then the checking simply transfers to $node_5$,
 which is the child of $node_1.e^6$.
 
 At $node_5$, since the next sub-string $T[i+8,\,5]=u^5 \in node_5$ and
 $u^5$ is marked as a pattern end, another pattern
-$T[i,\,13]=a^2e^6u^5$ (actually $p_4$ in $P$) is found at position
-$i$. Then the verification goes to the child of $node_5.u^5$, i.e.
-$node_{10}$.
+$T[i,\,13]=a^2e^6u^5$ ($p_4$ in $P$) is found at position $i$. Then
+the checking goes to the child of $node_5.u^5$, i.e.  $node_{10}$.
 
 At $node_{10}$, since $T[i+13,\,4]=sscc \notin node_{10}$, the
 verification for position $i$ terminates. And next, the engine will
@@ -795,13 +794,13 @@ number of keys ($ndp$), where $1 \leq ndp \leq 256$.
   \centering
   \includegraphics[width=0.75\textwidth]{./eps/Maps}
   \caption{The four sub-types of character maps. The triangles
-    represent the corresponding child nodes.}
+    represent the corresponding child nodes of the keys.}
   \label{fig:character map}
 \end{figure}
 
 Figure \ref{fig:character map} illustrates the four sub-types of
 character maps which are named according to their maximum
-capacity. Instead of using an array of (\emph{key, child pointer})
+capacity. Instead of using one array of (\emph{key, child pointer})
 pairs, the key part and the child pointer part are stored in the
 separate arrays, which is able to keep the node structure compact
 while supporting efficient search.
@@ -812,9 +811,9 @@ while supporting efficient search.
   another array of the same length for child pointers. The keys and
   child pointers are stored at corresponding positions in their
   arrays, and the keys are sorted according to their ACSII
-  values. Once the target string (character) is found in the key
-  array, its child pointer can be located through the same position in
-  the pointer array. Figure \ref{fig:character map} (a) shows a Map 4
+  values. Once the target character is found in the key array, its
+  child pointer can be located through the same position in the
+  pointer array. Figure \ref{fig:character map} (a) shows a Map 4
   structure with three keys: $f$, $n$ and $p$, where the triangles
   with the keys inside represent the corresponding child nodes.
 
@@ -843,10 +842,10 @@ while supporting efficient search.
   initialized to $NULL$. It is used for storing 49 to 256 keys.  In
   this kind of character map, the child node can be found directly
   through the array index which is the ASCII value of the target
-  character. Different from other sub-types of character maps, in Map
-  256, there is only one array and not necessary to carry out the
-  additional indirect access. Therefore, if most entries are not
-  empty, this representation is also very space efficient. Figure
+  character. Different from other character maps, in Map 256, there is
+  only one array, and it is not necessary to carry out the additional
+  indirect access. Therefore, if most entries are not empty, this
+  representation is also very space efficient. Figure
   \ref{fig:character map} (d) shows a Map 256 structure, where only
   the pointer array is adopted.
 \end{itemize}
@@ -866,7 +865,7 @@ given in Algorithm \ref{alg:character map}.
     \STATE
     \STATE $count \leftarrow$ Number of keys in the character map
     \STATE
-    \SWITCH{the sub-type of the character map}
+    \SWITCH{The type of the character map}
     \CASE{\textsf{Map 4}}
     \FOR{$i \leftarrow 0$ to $count-1$}
     \IF{$keys[i]=t\_ch$}
@@ -911,8 +910,8 @@ given in Algorithm \ref{alg:character map}.
 
 For the prefix set whose length of keys is greater than 1 ($lss > 1$)
 and the number of keys is not greater than 100 ($ndp \leq 100$), the
-\emph{string array} structure is constructed as a tree node. Similar
-to the Map 4 and Map 16 structures, the keys are stored in
+\emph{string array} structure is adopted as a tree node. Similar to
+the Map 4 and Map 16 structures, the keys are stored in
 lexicographical order in a separate key array of $ndp \times lss$
 bytes, in which each key takes $lss$ bytes. The child pointers are
 stored at the corresponding positions in another pointer array. Figure
@@ -928,7 +927,7 @@ three keys: $aaa$, $bbb$ and $ccc$.
 \end{figure}
 
 For efficiency, if the number of keys is less than 5, a naive linear
-search routine is used to search the target string in the key array;
+search is used to search the target string in the key array;
 otherwise, a more efficient (but complicated) binary search algorithm
 is adopted.  The pseudocode of the searching in a node whose type is
 string array is depicted in Algorithm \ref{alg:string array}, where we
@@ -988,12 +987,12 @@ For the prefix set whose number of keys is greater than 100 ($lss > 1$
 and $ndp > 100$), searching in the string array structure becomes
 inefficient even using a binary search. In this case, a more fast (but
 heavy) data structure --- \emph{hash table} is adopted to deal with
-large number of keys. It is worth noting that, the procedure of
-building a hash table is directly based on the suffix set from which
-the prefix set is formed rather than the prefix set which is the basis
-of building other node structures. In this work, a hash table is an
-array of child pointers with each pointer initialized to $NULL$, and
-we also utilize a \emph{string hash function} which transforms a
+large number of keys. It is worth noting that, the construction of the
+hash table is directly based on the suffix set from which the prefix
+set is formed rather than the prefix set which is the basis of
+building other node structures. In our implementation, a hash table is
+an array of child pointers with each pointer initialized to $NULL$,
+and we also utilize a \emph{string hash function} which transforms a
 string to a positive integer.
 
 % Indeed, when computing $ndp$, we
@@ -1014,7 +1013,7 @@ Algorithm \ref{alg:hash} shows the pseudocode of building a hash table
 based on $SF$. $SF$ is firstly partitioned into small suffix sets by
 hashing: for each suffix $suf \in SF$, its prefix $suf^{+lss}$ is
 hashed to an integer $i$ between 0 and $table\_size-1$ by the string
-hash function , then $suf$ is associated with the $i$-th slot of the
+hash function, then $suf$ is associated with the $i$-th slot of the
 hash table. After that, the suffixes whose length-$lss$ prefixes
 hashing to the same value are associated with the same slot of the
 hash table. Then, to address the hash collisions, for each slot that
@@ -1059,7 +1058,7 @@ table.
     \FOR{$i \leftarrow 0$ to $table\_size - 1$}
     \IF{$hash\_table[i]\, \neq\, NULL$}
     \STATE $SSF \leftarrow \{suf\,|\,suf\in SF\; and\; Hash(suf^{+lss})=i\}$
-    \STATE $new\_node \leftarrow$ adaptively create a tree node from
+    \STATE $new\_node \leftarrow$ Adaptively create a tree node from
     $SSF$, as shown in the \textbf{while} loop of Algorithm \ref{alg:amt}
     \STATE Associate $new\_node$ with $hash\_table[i]$
     \ENDIF
@@ -1071,11 +1070,10 @@ table.
 
 Given a target string of length $lss$, the hash value of that string
 is computed and used as the index of the hash table. If the
-corresponding slot is $NULL$, which means the target string fails to
-match any key in the hash table, the verification terminates and the
-engine moves to the next position; otherwise, the process goes to the
-tree node associated with that slot and compares the node with the
-corresponding substring in the text.
+corresponding slot is $NULL$, which means there is a mismatch, the
+verification terminates and the engine moves to the next position;
+otherwise, the process goes to the tree node associated with that slot
+and compares the node with the corresponding substring in the text.
 
 The string hash function adopted can have a significant effect on the
 performance of verifying. In our implementation, for each matching
@@ -1083,8 +1081,8 @@ task, the hash function is selected randomly from a \emph{hash
   function family} $H$. The hash function family adopted in our
 implementation is the fast \emph{shift-add-xor} hash family proposed
 by Ramakrishna \cite{Ramakrishna1997}, which is claimed to be both
-uniform and universal. The form of the hash function family is shown
-in Algorithm \ref{alg:hash fun}.
+uniform and universal. The framework of the hash function family is
+shown in Algorithm \ref{alg:hash fun}.
 
 %  satisfied with the
 % \textsf{uniformity}, \textsf{universality}, \textsf{applicability} and
