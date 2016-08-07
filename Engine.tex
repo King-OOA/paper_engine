@@ -346,9 +346,9 @@ $R = \{(i,\, p_j)\;|\; p_j \in P\; and\,\; T[i,\,|p_j|]=p_j\}$.
 \section{The Filter Module}
 \label{sec:filter}
 
-As mentioned before, our engine consists of the filter module and the
-verification module. In this section, we introduce the filter module,
-while in the next section the verification module will be illustrated.
+As mentioned before, our engine consists of a filter module and a
+verification module. In this section, we introduce the former, while
+in the next section the latter will be illustrated.
 
 % the whole pattern set is transformed to a compact tree-like structure
 % called Adaptive Matching Tree (AMT), where each tree node is built
@@ -361,19 +361,19 @@ while in the next section the verification module will be illustrated.
 % adaptively creating the tree nodes is presented in Section
 % \ref{subsec:nodes}.
 
-The filter we adopted in our engine is proposed by
-\cite{Lee2013}. Given the pattern set, as in the WM algorithm, only
-the length-$lsp$ prefix of each pattern are considering in
-constructing the filter, where $lsp$ is the \emph{length of the
-  shortest pattern} in the pattern set. Similar to WM, the filtering
-is based on character blocks (a character block is a short string
-consisting of only a few characters) rather than single
-characters. Given a block size $k$, the filter includes $lsp-k+1$
-membership query bitmaps denoted as $B_1$, $B_2$, \dots, and
-$B_{lsp-k+1}$, where each bitmap is a vector of $N$ bits. Let
-$B_j[i]$, $0 \leq i \leq N - 1$, $1 \leq j \leq lsp-k+1$, be the
-$i$-th bit of the $j$-th query bitmap, and $B_j[i]$ is set to 1 iff
-there exists a pattern $p_m$ such that $hash(p_m[j,k]) = i$
+The filter we adopted in our engine is proposed by \cite{Lee2013},
+which is an improvement of the filter in the WM algorithm. Given the
+pattern set, as in the WM algorithm, only the length-$lsp$ prefix of
+each pattern are considering in constructing the filter, where $lsp$
+is the \emph{length of the shortest pattern} in the pattern
+set. Similar to WM, the filtering is based on character blocks (a
+character block is a merely short string consisting of only a few
+characters) rather than single characters. Given a block size $k$, the
+filter includes $lsp-k+1$ membership query bitmaps denoted as $B_1$,
+$B_2$, \dots, and $B_{lsp-k+1}$, where each bitmap is a vector of $N$
+bits. Let $B_j[i]$, $0 \leq i \leq N - 1$, $1 \leq j \leq lsp-k+1$, be
+the $i$-th bit of the $j$-th query bitmap, and $B_j[i]$ is set to 1
+iff there exists a pattern $p_m$ such that $hash(p_m[j,k]) = i$
 ($p_m[j,k]$ is a $k$-symbol block starting at position $j$ of $p_m$),
 where $hash$ is a hash function that maps a $k$-symbol block to an
 integer in the range of $[0, N-1]$.
@@ -1156,6 +1156,37 @@ string. Through testing, we set $L=5$ and $R=2$ in our experiment,
 which is able to provide greater likelihood of a uniform distribution
 of hash values.
 
+\subsection{Further Improvements}
+\label{sec:further improments}
+
+The verification module presented above is pretty efficient, but there
+are still some techniques that can further improve the time and space
+efficiency of this module.
+
+\subsubsection{Dividing the AMT}
+\label{sec:divide amt}
+
+The verification module we have just built is based on a big single
+AMT which is constructed from the whole pattern set. Actually, we can
+divide the big AMT into small ones and enable each verifying procedure
+to refer to only one small AMT, by which the time for verifying can be
+reduced. The division is based on the following observations.
+
+As stated in the filter module, for a position $i$ of the text $T$, if
+some pattern $p_j$ starts at $i$, there must be
+$Hash[T[i+lss-k,k]] = Hash[p_j[lss-k+1,k]]$ (we call
+$Hash[p_j[lss-k+1,k]]$ the \emph{signature} of $p_j$). This means that
+we can group the patterns according to their signatures: patterns with
+the same signature are grouped together to form a sub-pattern-set, and
+for each sub-pattern-set we build a (small) AMT from it. In addition,
+an index table is adopted to allow the corresponding AMT be retrieved
+in $O(1)$ time by its signature. Now, the verification module is made
+up of an index table and several small AMTs.
+
+Particularly, once a suspicious position $i$ in $T$ is detected, the
+value $Hash[T[i+lss-k,k]]$ is used as the index of the index table to
+find the corresponding small AMT for verifying $i$. As the scale of
+the AMT shr, the time for each verifying is reduced accordingly.
 
 \section{Experimental Results}
 \label{sec:experiments}
