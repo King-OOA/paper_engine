@@ -1172,10 +1172,11 @@ divide the big AMT into small ones and enable each verifying procedure
 to refer to only one small AMT, by which the time for verifying can be
 reduced. The division is based on the following observations.
 
-As stated in the filter module, the filtering is based on the last
-$k$-symbol block of the sliding window. In particular, for a position
-$i$ of the text $T$, if some pattern $p_j$ starts at $i$, there must
-be $Hash[T[i+lss-k,k]] = Hash[p_j[lss-k+1,k]]$ (we call
+As stated in Section \ref{sec:filter}, the filtering is based on the
+last $k$-symbol block of the substring in the sliding window. In
+particular, for a position $i$ of the text $T$, if some pattern $p_j$
+starts at $i$, there must be
+$Hash[T[i+lss-k,k]] = Hash[p_j[lss-k+1,k]]$ (we call
 $Hash[p_j[lss-k+1,k]]$ the \emph{signature} of $p_j$). This means that
 we can group the patterns according to their signatures: patterns with
 the same signature are grouped together to form a sub-pattern-set, and
@@ -1184,25 +1185,42 @@ table is adopted to allow the corresponding AMT be retrieved in $O(1)$
 time by its signature. Now, the verification module is made up of an
 index table as well as several small AMTs.
 
-Particularly, once a suspicious position $i$ in $T$ is detected, the
-value $Hash[T[i+lss-k,k]]$ is used as the index of the index table to
-find the corresponding small AMT for verifying $i$. As the scale of
-the AMT shrunk, the time for each verifying is reduced accordingly.
+In the filtering phase, once a suspicious position $i$ in $T$ is
+detected, the value $Hash[T[i+lss-k,k]]$ will be used as the index of
+the index table to find the corresponding small AMT for verifying. As
+the scale of the AMT shrunk, the time for each verifying is reduced
+accordingly.
 
-\subsubsection{Node Merge}
+\subsubsection{Node Merging}
 \label{sec:node merge}
 
 The nodes in a path of AMT, each of which has only one key, can be
 merged into one node. This technique can reduce both time and space
 efficiency of the verification module. To illustrate this, consider
-the pattern set $P={p_1=, p_2=,p_3=}$ and its corresponding AMT
-constructed by the method presented in section . As shown in Fig , the
-built AMT has three nodes, and each of nodes has only one key. This
-AMT roughly takes bytes of memory ( bytes for the keys and 16 bytes
-for the child pointers), however, if we combine the three nodes into
-one, the keys will be merged into one string and the child pointers
-are no long needed. The only issue needs to be addressed is to
-distinguish the keys after they are merged.
+the pattern set $P=\{p_1=e^6u^5sscc,\, p_2=e^6u^5,\, p_3=e^6\}$ and
+its corresponding AMT constructed by Algorithm 1. As shown in Fig (a),
+the built AMT has three nodes, and each contains only one key. In a
+typical x86\_64 architecture, this implementation of AMT roughly takes
+55 bytes of memory: 15 bytes for the keys, 16 bytes for the child
+pointers and 24 bytes for the pointers to the matching
+functions. However, if we combine the three keys into one string, the
+three nodes can be merged into one node (Fig (b)), as a result, the
+child pointers are no longer needed and the number of function
+pointers is reduced from three to one. The merged node is another type
+of tree node in addition to the types we have introduced in Section
+\ref{subsec:nodes}.
+
+The only problem is to distinguish among the keys after they are
+concatenated, to address this issues, an \emph{length array} is used
+to store the length of each key, where each array element takes only
+one byte (using the \emph{unsigned char} type). From the length of
+each key, we can split the original keys out, and searching the target
+string in the merged node can be trivial.
+
+In general, after node merging, the AMT contains only one merged node
+which takes 26 bytes (15 bytes for the keys, 3 bytes for the length
+array, and 8 bytes for the matching function pointer), thus, 29 bytes
+are saved comparing with the original AMT.
 
 \section{Experimental Results}
 \label{sec:experiments}
