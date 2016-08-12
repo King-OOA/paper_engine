@@ -1194,38 +1194,59 @@ accordingly.
 \subsubsection{Node Merging}
 \label{sec:node merge}
 
-Similar to the ``path compression'' technique widely used in trie-like
-structures, the nodes in a path of AMT, each of which has only one
-key, can be merged into one node. This technique can improve both time
-and space efficiency of AMT. To illustrate this, consider the pattern
-set $P=\{p_1=e^6u^5sscc,\; p_2=e^6u^5,\; p_3=e^6\}$ and its
-corresponding AMT constructed by Algorithm 1. As shown in Fig (a), the
-built AMT has three nodes, and each contains only one key. In a
-typical x86\_64 architecture, this implementation of AMT roughly takes
-55 bytes of memory: 15 bytes for the keys, 16 bytes for the child
-pointers and 24 bytes for the pointers to the matching
+Similar to the ``path compression'' technique that is widely used in
+many trie-like structures, the nodes in a path of AMT, each of which
+has only one key, can be merged into one node. This technique can
+improve both time and space efficiency of AMT. To illustrate its
+benefits, consider the pattern set
+$P=\{p_1=e^6u^5sscc,\; p_2=e^6u^5,\; p_3=e^6\}$ and the corresponding
+AMT constructed by Algorithm 1. As shown in Fig (a), the built AMT has
+three nodes, and each contains only one key. In a typical x86\_64
+architecture, this implementation of AMT roughly takes 55 bytes of
+memory: 15 bytes for the three keys, 16 bytes for the two child
+pointers and 24 bytes for the three pointers to the matching
 functions. However, if we combine the three keys into one string,
 these three nodes can be merged into one node (Fig (b)), as a result,
 the child pointers are no longer needed and the number of function
 pointers is reduced from three to one. The merged node is another type
-of tree node in addition to the types we have introduced in Section
-\ref{subsec:nodes}.
+of tree node in addition to the node types we have introduced in
+Section \ref{subsec:nodes}.
 
 For the merged node, the only problem is how to distinguish among the
 keys after they are concatenated, to address this issues, a
 \emph{length array} is used to store the length of each key, where
 each array element takes only one byte (using the \emph{unsigned char}
-type). Through the length of each key, we can split the original keys
-out, and searching the target string in the merged node can be
+type). Through the length of each key, we can delimit each original
+keys, and thus, searching the target string in the merged node can be
 trivial.
 
-In general, after node merging, the AMT contains only one merged node
-which takes 26 bytes (15 bytes for the keys, 3 bytes for the length
-array, and 8 bytes for the matching function pointer), thus, 29 bytes
-are saved comparing with the original AMT. In addition, only one
+In general, after node merging, the AMT contains just one merged node
+which only takes 26 bytes (15 bytes for the keys, 3 bytes for the
+length array, and 8 bytes for the matching function pointer), thus, 29
+bytes are saved comparing with the original AMT. In addition, only one
 random access to the memory is needed to get the merged node (the
 original AMT needs three random memory accesses to get all its nodes),
-thus, the cache can be fully used to improve the performance.
+thus, the cache miss is reduced and the performance is improved.
+
+
+\subsubsection{Node splitting}
+\label{sec:node split}
+
+Once the keys in a node share a common prefix, that prefix can be
+removed from the keys and form a new single key node (since the prefix
+is either a character or a string, the type of the new node is either
+Map 4 or String Array). This technique can reduce a lot of redundant
+comparisons while searching a target key in that node. For instance,
+consider the node in Fig whose four keys share a common prefix $a^4$,
+and a target key which is $a^4u$. it will be compared with the four
+keys in order and finally takes $5 \times 4 = 20$ byte comparisons to
+determine the inexistence of target key. However, if $a^4$ is split
+out and form another new node as shown in Fig , for the same target,
+only 8 byte comparisons (4 comparisons for $node_1$ and another 4
+comparisons for $node_2$) is needed.
+
+
+
 
 \section{Experimental Results}
 \label{sec:experiments}
