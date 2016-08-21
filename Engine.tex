@@ -1233,17 +1233,20 @@ thus, the cache miss is reduced and the performance is improved.
 \label{sec:node split}
 
 Once the keys in a node share a common prefix, that prefix can be
-removed from the keys and form a new single key node (since the prefix
-is either a character or a string, the type of the new node is either
-Map 4 or String Array). This technique can reduce a lot of redundant
-comparisons while searching a target key in that node. For instance,
-consider the node in Fig whose four keys share a common prefix $a^4$,
-and a target key which is $a^4u$. it will be compared with the four
-keys in order and finally takes $5 \times 4 = 20$ byte comparisons to
-determine the inexistence of target key. However, if $a^4$ is split
-out and form another new node as shown in Fig , for the same target,
-only 8 byte comparisons (4 comparisons for $node_1$ and another 4
-comparisons for $node_2$) is needed.
+removed from the keys and form a new single key node. This technique
+can reduce a lot of redundant comparisons while searching a target key
+in a node. For instance, consider searching a target key $a^5u$ in a
+string array type node whose four keys share a common prefix $a^5$, as
+shown in Fig . According to Algorithm \ref{alg:string array}, the
+target key have to be compared sequentially with the four keys in the
+node, which will totally takes $6 \times 4 = 24$ byte comparisons to
+determine the inexistence of target key. However, if the common prefix
+$a^5$ is split out and form another new node as shown in Fig , for the
+same target, only 9 byte comparisons (5 comparisons for $node_1$ and
+another 4 comparisons for $node_2$) are needed for
+searching. Comparing with only one node, the two nodes can reduce 15
+comparisons. Note that, since the prefix is either a character or a
+string, the new node is either a Map 4 node or a String Array node.
 
 
 
