@@ -2,7 +2,7 @@
 
 \usepackage[numbers]{natbib}
 \citestyle{IEEEtran}
-
+ 
 \usepackage{graphicx}
 \usepackage{algorithm}
 \usepackage{algorithmic}
@@ -62,8 +62,8 @@
 
 {\textbf{Key words}: String Matching; Pattern Matching; Dictionary Matching}
 
-due to the effectiveness of the filter and the compactness of the AMT
-whether there are patterns starting at that position
+% due to the effectiveness of the filter and the compactness of the AMT
+% whether there are patterns starting at that position
 
 \section{Introduction}
 \label{sec:introduction}
@@ -1232,21 +1232,23 @@ thus, the cache miss is reduced and the performance is improved.
 \subsubsection{Node splitting}
 \label{sec:node split}
 
-Once the keys in a node share a common prefix, that prefix can be
-removed from the keys and form a new single key node. This technique
+In order to further improve the searching efficiency of tree nodes,
+once the keys in a node share a common prefix, that prefix should best
+be removed from the keys and form a new single key node. This method
 can reduce a lot of redundant comparisons while searching a target key
 in a node. For instance, consider searching a target key $a^5u$ in a
-string array type node whose four keys share a common prefix $a^5$, as
-shown in Fig . According to Algorithm \ref{alg:string array}, the
+node of string array type, whose four keys share a common prefix $a^5$
+, as shown in Fig . According to Algorithm \ref{alg:string array}, the
 target key have to be compared sequentially with the four keys in the
 node, which will totally takes $6 \times 4 = 24$ byte comparisons to
 determine the inexistence of target key. However, if the common prefix
-$a^5$ is split out and form another new node as shown in Fig , for the
-same target, only 9 byte comparisons (5 comparisons for $node_1$ and
-another 4 comparisons for $node_2$) are needed for
-searching. Comparing with only one node, the two nodes can reduce 15
-comparisons. Note that, since the prefix is either a character or a
-string, the new node is either a Map 4 node or a String Array node.
+$a^5$ is removed out of the keys and form another new node as shown in
+Fig , for the same target, only 9 byte comparisons are needed for
+verifying (5 comparisons for $node_1$ and another 4 comparisons for
+$node_2$). Note that, since the prefix is either a character or a
+string, the type of the new node is either Map 4 or String
+Array. Obviously, comparing with only one node, the two nodes version
+can reduce 15 comparisons, which .
 
 
 
