@@ -1,0 +1,167 @@
+\documentclass{paper}
+
+\title{Author's response to the review of No.IJPRAI-D-16-00429}
+
+
+
+\begin{document}
+
+\begin{center}
+{\Large \textbf{Author's response to the review of No.IJPRAI-D-16-00429\\[20pt]}}
+\end{center}
+
+
+\textbf{Dear Editors and Reviewers:\\}
+
+We would like to thank the reviewers and associate editors for their
+valuable and constructive comments and suggestions. Based on these
+comments and suggestions, we revised the paper, and the main revisions
+are as follows.\\
+
+\begin{center}
+\textbf{Revisions Based on the Comments of Reviewer 1}\\
+\end{center}
+
+\textbf{1.} The construction of AMT used a breadth-first search
+strategy, why does not use a depth-first strategy instead? Is there
+some inherent reasons? Please give an explanation.\\[7pt]
+\noindent \textbf{Response:} There is no essential distinction between
+the breadth-first strategy and the depth-first strategy in
+constructing the AMT. If the breadth-first strategy is adopted, the
+AMT will be built level by level; on the other hand, if the
+depth-first strategy is used, the AMT will be built branch by
+branch. But regardless of the strategies used, the final built AMTs
+are the same. We choose the breadth-first strategy to build the AMT
+level by level, and we have added this explanation to Section 5.1.\\
+
+\textbf{2.} Is the hash function used in the "Hash Table" node
+structure the same as in other algorithms such as WM and
+Pre-filter+AC?\\[7pt]
+\noindent \textbf{Response:} No, they are not the same. The hash
+functions used by the WM and Pre-filter+AC algorithms apply
+essentially to short strings which consist no more than 3 characters,
+whereas the hash function used in the \emph{hash node} must be able to
+process longer strings with more than 3 characters. Therefore, we
+choose the \emph{shift-add-xor} hash family for the hash node to
+process long
+strings.\\
+
+\textbf{3.} The chosen of the parameters is very important for
+building the tree nodes. Please give a more detailed instruction to
+the chosen of the parameters in section 6.1.\\[7pt]
+\noindent \textbf{Response:} For String Arrays containing no more than
+\textbf{4} strings, the simple linear search is faster than binary
+search due to the complexity of binary search. The load factor of the
+Hash Table is set to \textbf{0.5}, which is a good balance between
+time and space. The parameters about the hash function are chosen from
+its original paper, which are claimed to be very efficient. We have
+tested that once $ndp > 100$, the hash table structure becomes more
+efficient than the String Array structure. All these detailed
+explanations for parameter
+selections have been added to section 6.1.\\
+
+\textbf{4.} The captions and some table items in table 2, 3 and 4 are
+not very clear, please revise them.\\[7pt]
+\noindent \textbf{Response:} The captions of Table 2, 3 and 4 are
+revised. The \emph{Sing Char} and \emph{Single String} items in these
+tables are modified to \emph{Map 1} and \emph{Single String Array}, respectively.\\
+
+\begin{center}
+\textbf{Revisions Based on the Comments of Reviewer 2}\\
+\end{center}
+
+\textbf{1.} Is the hash function used in the \emph{Hash Table} node structure
+the same as in the filter module?\\[7pt]
+\noindent \textbf{Response:} No, they are not the same. The hash
+function used in the \emph{Hash Table} node comes from the
+\emph{shift-add-xor} hash family which is able to process long
+strings, whereas the hash function used in the filter module is
+usually a direct map which maps a short string to its decimal
+representation.\\
+
+\textbf{2.} Please explain how the two parameters $N$ and $k$ are chosen in the
+filter module.\\[7pt]
+\noindent \textbf{Response:} If $lsp \leq 5$, set $k = 2$; otherwise,
+set $k=3$. $N$ is set to be $|\Sigma|^k$. We have added this comments
+to Section 4.\\
+
+\textbf{3.} The authors choose to use a breadth-first strategy to
+build the AMT, is it possible to use a depth-first strategy instead?
+\noindent \textbf{Response:} Absolutely yes. Regardless of which
+strategies are used, the final constructed AMTs are the same.
+
+\textbf{4.} The example (Fig.2) in the filter module does not clearly
+show the interaction with the verification module. Please add some
+detailed illustrations.
+\noindent \textbf{Response:} Every time the filter module detects a
+potential matched position in the text (i.e., the last bit of
+$MB~\&~QB$ is 1), the verification module is invoked to check if there
+exists patterns starting at that position, and in the mean while, the
+matching window stops at that position, once the verification
+finishes, the filter module moves the matching window to the next
+position. We have added this detailed procedure to Section 4.\\
+
+\begin{center}
+\textbf{Revisions Based on the Comments of Reviewer 3}
+\end{center}
+
+There is no comments from reviewer 3.\\
+
+\begin{center}
+\textbf{Revisions Based on the Comments of Reviewer 4}
+\end{center}
+
+\textbf{1.} The novelty or fresh new ideas is not very clear, does not
+have enough comparisons with other methods in the literature.\\[7pt]
+\noindent \textbf{Response:} The major contributions of this paper
+are: 1. A novel data structure called Adaptive Matching Tree (AMT) is
+proposed to store the string pattern set efficiently. 2. A fast engine
+based on AMT is proposed, which is able to process large-scale string
+pattern sets. In addition, we have added another comparison with
+a recent algorithm to the experiment part of our paper.\\
+
+\textbf{2.} What is its relation to PR \& AI ? (Pattern Recognition \&
+Artificial Intelligence) Should explain it more clearly.\\[7pt]
+\noindent \textbf{Response:} The term \emph{pattern} has various
+meanings in various fields. In this paper, the term \emph{pattern} is
+specified to \emph{string pattern}, and accordingly \emph{pattern
+  recognition} is specified to \emph{string pattern searching}, which
+is one of the
+oldest and fundamental problems in computer science.\\
+
+\textbf{3.} Need to add more recent related publications in the
+reference list including , for examples 2015, 2016 PR \& AI subfield.\\[7pt]
+\noindent \textbf{Response:} We have already added several recent
+published (in 2015 or 2016) references
+about PR \& AI to our paper.\\
+
+\textbf{4.} Compare your work with others in the literature,
+advantages vs disadvantages, in depth and width.\\[7pt]
+\noindent \textbf{Response:} We have added another comparison in our
+experiment to a recent published multi-string pattern matching
+algorithm called \textsf{Split} proposed by \emph{Kim, HyunJin AND
+  Choi, Kang-Il AND Choi, Sang-Il. A Memory-Efficient Deterministic
+  Finite Automaton-Based Bit-Split String Matching Scheme Using
+  Pattern Uniqueness in Deep Packet
+  Inspection. PLOS ONE. vol.10. pp.1-24. 2015.}\\
+
+\textbf{5.} Should use real images with noisy and testing samples set
+size should be large enough to show your results are indeed
+convincing,
+reliable, and meaningful.\\[7pt]
+\noindent \textbf{Response:} Unfortunately, our method only focuses
+on string patterns, so it does not apply to images.\\
+
+\textbf{6.} This paper is not very well written. Its English
+presentation is not good enough. Should consult English technical
+writing expert to help.\\[7pt]
+\noindent \textbf{Response:} We have carefully revised the paper again
+to improve its presentation, so we hope it is more readable and easy
+to understand now.
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
